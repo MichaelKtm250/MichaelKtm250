@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Foreman Affiliates Agency</title>
+  <style>
+    body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 0; background: #fafafa; color: #333; }
+    header { background: #0d1b2a; color: #fff; padding: 30px; text-align: center; }
+    header h1 { margin: 0; font-size: 2.2em; }
+    header p { margin: 8px 0 0; font-size: 1.1em; color: #cfd8dc; }
+    section { padding: 30px; max-width: 900px; margin: auto; }
+    h2 { color: #0d1b2a; margin-bottom: 10px; }
+    form input, textarea { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 4px; }
+    button { background: #0073e6; color: #fff; border: none; padding: 12px 24px; font-size: 1em; border-radius: 4px; cursor: pointer; }
+    button:hover { background: #005bb5; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    td, th { border: 1px solid #ccc; padding: 10px; text-align: left; }
+    footer { background: #0d1b2a; color: #cfd8dc; text-align: center; padding: 20px; font-size: 0.9em; margin-top: 40px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🌐 Foreman Affiliates Agency</h1>
+    <p>Worldwide affiliate solutions. Trusted. Professional. Results-driven.</p>
+  </header>
+
+  <section id="about">
+    <h2>About Us</h2>
+    <p>We connect products to people worldwide with strategic affiliate partnerships. 
+       This system helps generate links, messages, and campaigns at scale—professionally and transparently.</p>
+  </section>
+
+  <section id="generator">
+    <h2>Affiliate Link & Message Generator</h2>
+    <form id="genForm">
+      <label>Base URL:<br><input type="text" id="base" value="https://merchant.example/product"></label><br><br>
+      <label>Affiliate ID:<br><input type="text" id="affid" value="YOUR_AFF_ID"></label><br><br>
+      <label>Products (name,sku,discount one per line):<br>
+        <textarea id="products" rows="6" cols="60">Product A,A100,15
+Product B,B200,</textarea>
+      </label><br><br>
+      <button type="submit">Generate</button>
+    </form>
+
+    <div id="results"></div>
+    <button id="download" style="display:none;">Download CSV</button>
+  </section>
+
+  <footer>
+    <p>© 2025 Foreman Affiliates Agency • Disclosure: We may earn commissions at no extra cost to you.</p>
+  </footer>
+
+  <script>
+    function makeLink(base, affId, sku) {
+      const tid = crypto.randomUUID();
+      const params = new URLSearchParams({ aff_id: affId, tid, product: sku });
+      return `${base}?${params.toString()}`;
+    }
+
+    function createMessage(name, link, discount) {
+      let d = discount ? ` Save ${discount}%!` : "";
+      let u = discount ? " Limited time offer." : " Available while stocks last.";
+      return `Check out ${name}!${d} Buy here: ${link}${u}`;
+    }
+
+    document.getElementById("genForm").addEventListener("submit", e => {
+      e.preventDefault();
+      const base = document.getElementById("base").value;
+      const affId = document.getElementById("affid").value;
+      const products = document.getElementById("products").value.trim().split("\n");
+
+      let rows = [["Product","SKU","Link","Message"]];
+      let html = "<table><tr><th>Product</th><th>SKU</th><th>Link</th><th>Message</th></tr>";
+
+      products.forEach(line => {
+        if (!line) return;
+        const [name, sku, discount] = line.split(",");
+        const link = makeLink(base, affId, sku || "");
+        const msg = createMessage(name, link, discount);
+        rows.push([name, sku || "", link, msg]);
+        html += `<tr><td>${name}</td><td>${sku||""}</td><td><a href="${link}" target="_blank">link</a></td><td>${msg}</td></tr>`;
+      });
+
+      html += "</table>";
+      document.getElementById("results").innerHTML = html;
+      document.getElementById("download").style.display = "inline-block";
+
+      // Save CSV data for download
+      document.getElementById("download").onclick = () => {
+        let csv = rows.map(r => r.map(v => `"${v}"`).join(",")).join("\n");
+        let blob = new Blob([csv], { type: "text/csv" });
+        let url = URL.createObjectURL(blob);
+        let a = document.createElement("a");
+        a.href = url;
+        a.download = "affiliate_links.csv";
+        a.click();
+      };
+    });
+  </script>
+</body>
+</html>
