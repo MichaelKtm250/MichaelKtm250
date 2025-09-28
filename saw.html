@@ -1,26 +1,24 @@
+document.getElementById("btnAuto").onclick = () => {
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Saw Affiliate Experience</title>
-<style>
-  body { margin:0; background:#000; color:#fff; font-family:Arial,sans-serif; text-align:center; }
-  h1 { margin:30px 0; }
-  a.demo { display:block; margin:20px auto; padding:16px 24px; width:260px; border-radius:8px; background:#0d1b2a; color:#fff; text-decoration:none; font-size:18px; }
-  a.demo:hover { background:#cfd8dc; color:#0d1b2a; }
-
-  /* overlay for hologram test */
-  .overlay {
-    position:fixed; inset:0; display:flex; justify-content:center; align-items:center;
-    background:rgba(0,0,0,0.9); flex-direction:column; text-align:center;
-    visibility:hidden; opacity:0; transition:.4s;
-  }
-  .overlay.show { visibility:visible; opacity:1; }
-  .doll { width:300px; margin-bottom:15px; }
-  .prompt { font-size:18px; margin:15px 0; }
-  .result { margin-top:20px; font-size:20px; }
-</style>
+  <meta charset="UTF-8">
+  <title>Saw Affiliate Experience</title>
+  <style>
+    body { margin:0; background:#000; color:#fff; font-family:Arial,sans-serif; text-align:center; }
+    h1 { margin:30px 0; }
+    a.demo { display:block; margin:20px auto; padding:16px 24px; width:260px; border-radius:8px; background:#0d1b2a; color:#fff; text-decoration:none; font-size:18px; }
+    a.demo:hover { background:#cfd8dc; color:#0d1b2a; }
+    .overlay {
+      position:fixed; inset:0; display:flex; justify-content:center; align-items:center;
+      background:rgba(0,0,0,0.9); flex-direction:column; text-align:center;
+      visibility:hidden; opacity:0; transition:.4s;
+    }
+    .overlay.show { visibility:visible; opacity:1; }
+    .doll { width:300px; margin-bottom:15px; }
+    .prompt { font-size:18px; margin:15px 0; }
+    .result { margin-top:20px; font-size:20px; }
+  </style>
 </head>
 <body>
 
@@ -31,12 +29,24 @@
 
 <!-- Hologram Experience (Strictly a Test Theory) -->
 <div id="overlay" class="overlay">
-  <img src="https://i.imgur.com/3z6m7sL.png" alt="Saw Doll Hologram" class="doll">
+  <img src="https://placehold.co/300x300/000000/FF0000/png?text=Saw+Hologram" alt="Saw Doll Hologram" class="doll">
   <div class="prompt" id="promptText">...</div>
   <div class="result" id="resultBox"></div>
 </div>
 
+<!-- Fallback text input for answer -->
+<div id="fallbackInput" style="display:none; margin-top:30px;">
+  <label for="typedAnswer">Type your answer:</label>
+  <input type="text" id="typedAnswer" style="width:220px; padding:8px; font-size:16px;">
+  <button id="submitTyped" style="margin-left:10px; padding:8px 16px; font-size:16px;">Submit</button>
+</div>
+</div>
+
 <script>
+function showFallback() {
+  document.getElementById("fallbackInput").style.display = "block";
+}
+
 // === Shared Functions ===
 function speak(text) {
   return new Promise(resolve => {
@@ -88,17 +98,37 @@ async function runExperience(username="Player") {
   await speak("Tell me... What is it that you truly desire?");
   await speak("Answer this correctly and you will receive the browsing link and your prayers answered. Good luck.");
 
-  const heard = await listenOnce();
-  if(!heard){ result.innerHTML="❌ No answer detected."; return; }
-  result.innerHTML=`Heard: "${heard}"`;
-
+  let heard;
+  try {
+    heard = await listenOnce();
+  } catch(e) {
+    heard = null;
+  }
+  if(!heard){
+    showFallback();
+    result.innerHTML = "❌ No answer detected. You can type your answer below.";
+    document.getElementById("submitTyped").onclick = function() {
+      const typed = document.getElementById("typedAnswer").value.trim().toLowerCase();
+      result.innerHTML = `Heard: "${typed}"`;
+      const found = matchAffiliate(typed);
+      if(found){
+        speak("Interesting... your path is revealed.");
+        result.innerHTML = `<a href="${found.url}" target="_blank" style="color:#ffd700">${found.label}</a>`;
+      } else {
+        speak("Your answer is unclear. Come back when you know yourself.");
+        result.innerHTML = "🤔 No clear match. Try saying money, love, or freedom.";
+      }
+    };
+    return;
+  }
+  result.innerHTML = `Heard: "${heard}"`;
   const found = matchAffiliate(heard);
   if(found){
     await speak("Interesting... your path is revealed.");
-    result.innerHTML=`<a href="${found.url}" target="_blank" style="color:#ffd700">${found.label}</a>`;
+    result.innerHTML = `<a href="${found.url}" target="_blank" style="color:#ffd700">${found.label}</a>`;
   } else {
     await speak("Your answer is unclear. Come back when you know yourself.");
-    result.innerHTML="🤔 No clear match. Try saying money, love, or freedom.";
+    result.innerHTML = "🤔 No clear match. Try saying money, love, or freedom.";
   }
 }
 
