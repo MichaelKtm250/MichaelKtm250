@@ -3,27 +3,375 @@
 <head>
 	<meta charset="UTF-8">
 	<title>Foreman Affiliates Agency</title>
-	<style>
-		body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 0; background: #fafafa; color: #333; }
-		header { background: #0d1b2a; color: #fff; padding: 30px; text-align: center; }
-		header h1 { margin: 0; font-size: 2.2em; }
-		header p { margin: 8px 0 0; font-size: 1.1em; color: #cfd8dc; }
-		section { padding: 30px; max-width: 900px; margin: auto; }
-		h2 { color: #0d1b2a; margin-bottom: 10px; }
-		form input, textarea { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 4px; }
-		button { background: #0073e6; color: #fff; border: none; padding: 12px 24px; font-size: 1em; border-radius: 4px; cursor: pointer; }
-		button:hover { background: #005bb5; }
-		table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-		td, th { border: 1px solid #ccc; padding: 10px; text-align: left; }
-		footer { background: #0d1b2a; color: #cfd8dc; text-align: center; padding: 20px; font-size: 0.9em; margin-top: 40px; }
-	</style>
 </head>
-<body>
-	<header>
-		<h1>🌐 Foreman Affiliates Agency</h1>
+<script>
+if ("serviceWorker" in navigator) {
+	navigator.serviceWorker.register("/service-worker.js")
+		.then(() => console.log("✅ Service Worker registered"))
+		.catch(err => console.error("Service Worker registration failed:", err));
+}
+</script>
+
+					<!-- Reviews Section -->
+					<section id="reviews">
+						<h2>What People Say</h2>
+						<div class="review">
+							<p>"Fantastic service, quick response and very professional."</p>
+							<span>- Alex R.</span>
+						</div>
+						<div class="review">
+							<p>"Helped me out a lot, I’ll definitely be back again!"</p>
+							<span>- Jordan M.</span>
+						</div>
+						<div class="review">
+							<p>"Couldn’t ask for better — highly recommend."</p>
+							<span>- Taylor S.</span>
+						</div>
+					</section>
+
+					<!-- Contact Form -->
+					<section id="contact">
+						<h2>Contact Me</h2>
+						<form action="https://formspree.io/f/xovkjpdb" method="POST">
+							<label for="name">Name:</label>
+							<input type="text" id="name" name="name" required>
+
+							<label for="email">Email:</label>
+							<input type="email" id="email" name="email" required>
+
+							<label for="message">Message:</label>
+							<textarea id="message" name="message" rows="5" required></textarea>
+
+							<!-- Redirect after submission -->
+							<input type="hidden" name="_redirect" value="thankyou.html">
+
+							<button type="submit">Send Message</button>
+						</form>
+					</section>
+
+					<style>
+						#contact, #reviews {
+							max-width: 600px;
+							margin: 40px auto;
+							padding: 20px;
+							border: 1px solid #ccc;
+							border-radius: 8px;
+							background: #f9f9f9;
+							font-family: Arial, sans-serif;
+						}
+						#contact h2, #reviews h2 { text-align: center; margin-bottom: 20px; }
+						#contact label { display: block; margin-top: 10px; font-weight: bold; }
+						#contact input, #contact textarea {
+							width: 100%; padding: 10px; margin-top: 5px;
+							border: 1px solid #ccc; border-radius: 4px; font-size: 14px;
+						}
+						#contact button {
+							margin-top: 15px; padding: 12px; width: 100%;
+							border: none; background: #ff2d2d; color: #fff;
+							font-size: 16px; border-radius: 4px; cursor: pointer;
+						}
+						#contact button:hover { background: #cc2424; }
+						#reviews .review { font-style: italic; text-align: center; margin-bottom: 20px; }
+						#reviews span { display: block; margin-top: 5px; font-weight: bold; }
+					</style>
+				});
+			}
+		})
+		.catch(err => console.error("❌ SW registration failed:", err));
+}
+</script>
+
+		<!-- Reviews Section -->
+		<section id="reviews">
+			<h2>What People Say</h2>
+			<div class="review active">
+				<p>"Fantastic service, quick response and very professional."</p>
+				<span>- Alex R.</span>
+			</div>
+			<div class="review">
+				<p>"Helped me out a lot, I’ll definitely be back again!"</p>
+				<span>- Jordan M.</span>
+			</div>
+			<div class="review">
+				<p>"Couldn’t ask for better — highly recommend."</p>
+				<span>- Taylor S.</span>
+			</div>
+			<div id="review-dots"></div>
+		</section>
+
+		<!-- Contact Form -->
+		<section id="contact">
+			<h2>Contact Me</h2>
+			<form action="https://formspree.io/f/xovkjpdb" method="POST">
+				<label for="name">Name:</label>
+				<input type="text" id="name" name="name" required>
+
+				<label for="email">Email:</label>
+				<input type="email" id="email" name="email" required>
+
+				<label for="message">Message:</label>
+				<textarea id="message" name="message" rows="5" required></textarea>
+
+				<!-- Redirect after submission -->
+				<input type="hidden" name="_redirect" value="thankyou.html">
+
+				<button type="submit">Send Message</button>
+			</form>
+		</section>
+
+		<style>
+				#reviews {
+					max-width: 600px;
+					margin: 40px auto;
+					padding: 20px;
+					border: 1px solid #ccc;
+					border-radius: 8px;
+					background: #f9f9f9;
+					font-family: Arial, sans-serif;
+					text-align: center;
+					position: relative;
+				}
+				#reviews .review { display: none; font-style: italic; }
+				#reviews .review.active { display: block; }
+				#reviews span { display: block; margin-top: 5px; font-weight: bold; }
+				#review-dots { margin-top: 15px; }
+				#review-dots span {
+					display: inline-block;
+					width: 12px; height: 12px;
+					margin: 0 5px;
+					border-radius: 50%;
+					background: #ccc;
+					cursor: pointer;
+				}
+				#review-dots .active { background: #ff2d2d; }
+				#contact {
+					max-width: 600px;
+					margin: 40px auto;
+					padding: 20px;
+					border: 1px solid #ccc;
+					border-radius: 8px;
+					background: #f9f9f9;
+					font-family: Arial, sans-serif;
+				}
+				#contact h2 { text-align: center; margin-bottom: 20px; }
+				#contact label { display: block; margin-top: 10px; font-weight: bold; }
+				#contact input, #contact textarea {
+					width: 100%; padding: 10px; margin-top: 5px;
+					border: 1px solid #ccc; border-radius: 4px; font-size: 14px;
+				}
+				#contact button {
+					margin-top: 15px; padding: 12px; width: 100%;
+					border: none; background: #ff2d2d; color: #fff;
+					font-size: 16px; border-radius: 4px; cursor: pointer;
+				}
+				#contact button:hover { background: #cc2424; }
+		</style>
+		<h1>Foreman Affiliates Agency</h1>
 		<p>Worldwide affiliate solutions. Trusted. Professional. Results-driven.</p>
 	</header>
 
+	<section>
+		<h2>Affiliate Link & Message Generator</h2>
+		<form id="genForm">
+			<label>Base URL:<br>
+				<input type="text" id="baseUrl" placeholder="https://merchant.example/product">
+			</label>
+			<label>Affiliate ID:<br>
+				<input type="text" id="affiliateId" placeholder="YOUR_AFF_ID">
+			</label>
+			<label>Products (name,sku,discount one per line):<br>
+				<textarea id="products" rows="4" placeholder="Product A,A100,15&#10;Product B,B200,20"></textarea>
+			</label>
+			<button type="submit">Generate</button>
+		</form>
+
+		<div id="output"></div>
+	</section>
+
+	<footer>
+		Built by Michael Foreman | © 2025. We don’t store your data — everything runs locally.
+	</footer>
+
+	<script>
+		document.getElementById("genForm").addEventListener("submit", function(e) {
+			e.preventDefault();
+
+			const baseUrl = document.getElementById("baseUrl").value.trim();
+			const affId = document.getElementById("affiliateId").value.trim();
+			const products = document.getElementById("products").value.trim().split("\n");
+			let outputHtml = "<table><tr><th>Product</th><th>SKU</th><th>Link</th><th>Message</th></tr>";
+
+			products.forEach(line => {
+				const [name, sku, discount] = line.split(",");
+				if (!name || !sku) return;
+				const link = `${baseUrl}?aff_id=${affId}&sku=${sku}`;
+				const msg = `Check out ${name}! Save ${discount || 0}%! Buy here: ${link}`;
+				outputHtml += `<tr><td>${name}</td><td>${sku}</td><td><a href="${link}" target="_blank">link</a></td><td>${msg}</td></tr>`;
+			});
+
+			outputHtml += "</table>";
+			document.getElementById("output").innerHTML = outputHtml;
+		});
+	</script>
+<!-- Footer -->
+<footer id="footer">
+	<p>&copy; 2025 Foreman Affiliates Agency. All rights reserved.</p>
+	<div class="footer-links">
+		<a href="index.html">Home</a>
+		<a href="#reviews">Reviews</a>
+		<a href="#contact">Contact</a>
+	</div>
+	<div class="footer-socials">
+		<a href="mailto:michaelforemannn00@outlook.com">Email</a> |
+		<a href="https://www.linkedin.com/" target="_blank">LinkedIn</a> |
+		<a href="https://twitter.com/" target="_blank">Twitter</a>
+	</div>
+</footer>
+<style>
+	#footer {
+		margin-top: 50px;
+		padding: 20px;
+		background: #333;
+		color: #fff;
+		text-align: center;
+		font-family: Arial, sans-serif;
+	}
+	#footer .footer-links {
+		margin: 10px 0;
+	}
+	#footer .footer-links a,
+	#footer .footer-socials a {
+		color: #ff2d2d;
+		margin: 0 8px;
+		text-decoration: none;
+		font-weight: bold;
+	}
+	#footer .footer-links a:hover,
+	#footer .footer-socials a:hover {
+		color: #fff;
+	}
+</style>
+	<header>
+		<h1>Foreman Affiliates Agency</h1>
+		<p>Worldwide affiliate solutions. Trusted. Professional. Results-driven.</p>
+	</header>
+		<!-- Reviews Section -->
+		<section id="reviews">
+			<h2>What People Say</h2>
+			<div class="review active">
+				<p>"Fantastic service, quick response and very professional."</p>
+				<span>- Alex R.</span>
+			</div>
+			<div class="review">
+				<p>"Helped me out a lot, I’ll definitely be back again!"</p>
+				<span>- Jordan M.</span>
+			</div>
+			<div class="review">
+				<p>"Couldn’t ask for better — highly recommend."</p>
+				<span>- Taylor S.</span>
+			</div>
+		</section>
+
+		<!-- Contact Form -->
+		<section id="contact">
+			<h2>Contact Me</h2>
+			<form action="https://formspree.io/f/xovkjpdb" method="POST">
+				<label for="name">Name:</label>
+				<input type="text" id="name" name="name" required>
+
+				<label for="email">Email:</label>
+				<input type="email" id="email" name="email" required>
+
+				<label for="message">Message:</label>
+				<textarea id="message" name="message" rows="5" required></textarea>
+
+				<!-- Redirect after submission -->
+				<input type="hidden" name="_redirect" value="thankyou.html">
+
+				<button type="submit">Send Message</button>
+			</form>
+		</section>
+
+		<style>
+			#contact {
+				max-width: 600px;
+				margin: 40px auto;
+				padding: 20px;
+				border: 1px solid #ccc;
+				border-radius: 8px;
+				background: #f9f9f9;
+				font-family: Arial, sans-serif;
+			}
+			#contact h2 { text-align: center; margin-bottom: 20px; }
+			#contact label { display: block; margin-top: 10px; font-weight: bold; }
+			#contact input, #contact textarea {
+				width: 100%; padding: 10px; margin-top: 5px;
+				border: 1px solid #ccc; border-radius: 4px; font-size: 14px;
+			}
+			#contact button {
+				margin-top: 15px; padding: 12px; width: 100%;
+				border: none; background: #ff2d2d; color: #fff;
+				font-size: 16px; border-radius: 4px; cursor: pointer;
+			}
+			#contact button:hover { background: #cc2424; }
+		</style>
+		<!-- Contact Form -->
+		<section id="contact">
+			<h2>Contact Me</h2>
+			<form action="https://formspree.io/f/xovkjpdb" method="POST">
+				<label for="name">Name:</label>
+				<input type="text" id="name" name="name" required>
+
+				<label for="email">Email:</label>
+				<input type="email" id="email" name="email" required>
+
+				<label for="message">Message:</label>
+				<textarea id="message" name="message" rows="5" required></textarea>
+
+				<!-- Redirect after submission -->
+				<input type="hidden" name="_redirect" value="thankyou.html">
+
+				<button type="submit">Send Message</button>
+			</form>
+		</section>
+
+		<style>
+			#contact, #reviews {
+				max-width: 600px;
+				margin: 40px auto;
+				padding: 20px;
+				border: 1px solid #ccc;
+				border-radius: 8px;
+				background: #f9f9f9;
+				font-family: Arial, sans-serif;
+			}
+			#contact h2, #reviews h2 { text-align: center; margin-bottom: 20px; }
+			#contact label { display: block; margin-top: 10px; font-weight: bold; }
+			#contact input, #contact textarea {
+				width: 100%; padding: 10px; margin-top: 5px;
+				border: 1px solid #ccc; border-radius: 4px; font-size: 14px;
+			}
+			#contact button {
+				margin-top: 15px; padding: 12px; width: 100%;
+				border: none; background: #ff2d2d; color: #fff;
+				font-size: 16px; border-radius: 4px; cursor: pointer;
+			}
+			#contact button:hover { background: #cc2424; }
+			#reviews .review { display: none; font-style: italic; text-align: center; }
+			#reviews .review.active { display: block; }
+			#reviews span { display: block; margin-top: 5px; font-weight: bold; }
+		</style>
+
+		<script>
+			let reviews = document.querySelectorAll("#reviews .review");
+			let currentReview = 0;
+			function showNextReview() {
+				reviews[currentReview].classList.remove("active");
+				currentReview = (currentReview + 1) % reviews.length;
+				reviews[currentReview].classList.add("active");
+			}
+			setInterval(showNextReview, 5000);
+		</script>
 	<section id="about">
 		<h2>About Us</h2>
 		<p>We connect products to people worldwide with strategic affiliate partnerships. 
@@ -102,6 +450,36 @@ Product B,B200,</textarea>
 </body>
 <!-- Contact form section -->
 <section id="contact">
+<script>
+	let reviews = document.querySelectorAll("#reviews .review");
+	let dotsContainer = document.getElementById("review-dots");
+	let currentReview = 0;
+
+	// Create dots
+	reviews.forEach((_, i) => {
+		let dot = document.createElement("span");
+		dot.addEventListener("click", () => showReview(i));
+		dotsContainer.appendChild(dot);
+	});
+
+	let dots = dotsContainer.querySelectorAll("span");
+
+	function showReview(i) {
+		reviews[currentReview].classList.remove("active");
+		dots[currentReview].classList.remove("active");
+		currentReview = i;
+		reviews[currentReview].classList.add("active");
+		dots[currentReview].classList.add("active");
+	}
+
+	function showNextReview() {
+		let next = (currentReview + 1) % reviews.length;
+		showReview(next);
+	}
+
+	showReview(0); // init
+	setInterval(showNextReview, 5000);
+</script>
 	<h2>Contact Me</h2>
 	<form action="https://formspree.io/f/xovkjpdb" method="POST">
 		<label for="name">Name:</label>
