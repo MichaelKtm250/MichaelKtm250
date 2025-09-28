@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Saw Affiliate Experience</title>
+<style>
+  body { margin:0; background:#000; color:#fff; font-family:Arial,sans-serif; text-align:center; }
+  h1 { margin:30px 0; }
+  a.demo { display:block; margin:20px auto; padding:16px 24px; width:260px; border-radius:8px; background:#0d1b2a; color:#fff; text-decoration:none; font-size:18px; }
+  a.demo:hover { background:#cfd8dc; color:#0d1b2a; }
+
+  /* overlay for hologram test */
+  .overlay {
+    position:fixed; inset:0; display:flex; justify-content:center; align-items:center;
+    background:rgba(0,0,0,0.9); flex-direction:column; text-align:center;
+    visibility:hidden; opacity:0; transition:.4s;
+  }
+  .overlay.show { visibility:visible; opacity:1; }
+  .doll { width:300px; margin-bottom:15px; }
+  .prompt { font-size:18px; margin:15px 0; }
+  .result { margin-top:20px; font-size:20px; }
+</style>
+</head>
+<body>
+
+<h1>🎭 Saw Affiliate Experience</h1>
+<p>Choose a demo mode:</p>
+<a href="#" id="btnTrigger" class="demo">▶ Button Trigger Demo</a>
+<a href="#" id="btnAuto" class="demo">⚡ Auto Start Demo</a>
+
+<!-- Hologram Experience (Strictly a Test Theory) -->
+<div id="overlay" class="overlay">
+  <img src="https://i.imgur.com/3z6m7sL.png" alt="Saw Doll Hologram" class="doll">
+  <div class="prompt" id="promptText">...</div>
+  <div class="result" id="resultBox"></div>
+</div>
+
+<script>
+// === Shared Functions ===
+function speak(text) {
+  return new Promise(resolve => {
+    const u = new SpeechSynthesisUtterance(text);
+    u.rate = 0.9; u.pitch = 0.8;
+    speechSynthesis.speak(u);
+    u.onend = resolve;
+  });
+}
+
+function listenOnce(timeout=8000) {
+  return new Promise((resolve,reject) => {
+    const Rec = window.SpeechRecognition||window.webkitSpeechRecognition;
+    if(!Rec) return reject("No recognition API");
+    const rec = new Rec(); rec.lang="en-US";
+    rec.start();
+    let done=false;
+    rec.onresult=e=>{
+      if(done) return;
+      done=true;
+      resolve(e.results[0][0].transcript.toLowerCase());
+    };
+    rec.onerror=()=>!done&&resolve(null);
+    rec.onend=()=>!done&&resolve(null);
+    setTimeout(()=>!done&&resolve(null),timeout);
+  });
+}
+
+const AFFILIATE = [
+  {k:["money","wealth"], url:"https://affiliate-money.com", label:"💰 Unlock Wealth"},
+  {k:["love"], url:"https://affiliate-love.com", label:"❤️ Find Love"},
+  {k:["freedom"], url:"https://affiliate-freedom.com", label:"🕊️ Claim Freedom"}
+];
+function matchAffiliate(text) {
+  if(!text) return null;
+  for(const a of AFFILIATE) {
+    if(a.k.some(kw=>text.includes(kw))) return a;
+  }
+  return null;
+}
+
+async function runExperience(username="Player") {
+  document.getElementById("overlay").classList.add("show");
+  const prompt = document.getElementById("promptText");
+  const result = document.getElementById("resultBox");
+  result.innerHTML="";
+
+  await speak(`Hello ${username}... Let's play a game.`);
+  await speak("Tell me... What is it that you truly desire?");
+  await speak("Answer this correctly and you will receive the browsing link and your prayers answered. Good luck.");
+
+  const heard = await listenOnce();
+  if(!heard){ result.innerHTML="❌ No answer detected."; return; }
+  result.innerHTML=`Heard: "${heard}"`;
+
+  const found = matchAffiliate(heard);
+  if(found){
+    await speak("Interesting... your path is revealed.");
+    result.innerHTML=`<a href="${found.url}" target="_blank" style="color:#ffd700">${found.label}</a>`;
+  } else {
+    await speak("Your answer is unclear. Come back when you know yourself.");
+    result.innerHTML="🤔 No clear match. Try saying money, love, or freedom.";
+  }
+}
+
+// === Demo Selectors ===
+document.getElementById("btnTrigger").onclick = () => {
+  const name = prompt("Enter your name:","Michael")||"Player";
+  runExperience(name);
+};
+document.getElementById("btnAuto").onclick = () => {
+  const name = prompt("Enter your name:","Michael")||"Player";
+  runExperience(name);
+};
+</script>
+</body>
+</html>
