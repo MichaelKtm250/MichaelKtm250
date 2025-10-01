@@ -1,101 +1,127 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Foreman Affiliates Agency</title>
-  <style>
-    body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 0; background: #fafafa; color: #333; }
-    header { background: #0d1b2a; color: #fff; padding: 30px; text-align: center; }
-    header h1 { margin: 0; font-size: 2.2em; }
-    header p { margin: 8px 0 0; font-size: 1.1em; color: #cfd8dc; }
-    section { padding: 30px; max-width: 900px; margin: auto; }
-    h2 { color: #0d1b2a; margin-bottom: 10px; }
-    form input, textarea { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 4px; }
-    button { background: #0073e6; color: #fff; border: none; padding: 12px 24px; font-size: 1em; border-radius: 4px; cursor: pointer; }
-    button:hover { background: #005bb5; }
-    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-    td, th { border: 1px solid #ccc; padding: 10px; text-align: left; }
-    footer { background: #0d1b2a; color: #cfd8dc; text-align: center; padding: 20px; font-size: 0.9em; margin-top: 40px; }
-  </style>
+  <link rel="canonical" href="https://www.foremanaffiliatesagency.com/">
+  <link rel="stylesheet" href="styles.css?v=6">
 </head>
 <body>
-  <header>
-    <h1>🌐 Foreman Affiliates Agency</h1>
+  <header class="hero">
+    <h1>Foreman Affiliates Agency</h1>
     <p>Worldwide affiliate solutions. Trusted. Professional. Results-driven.</p>
   </header>
 
-  <section id="about">
-    <h2>About Us</h2>
-    <p>We connect products to people worldwide with strategic affiliate partnerships. 
-       This system helps generate links, messages, and campaigns at scale—professionally and transparently.</p>
-  </section>
+  <main class="container">
+    <section id="about">
+      <h2>About Us</h2>
+      <p>We connect products to people worldwide with strategic affiliate partnerships. This system generates links, messages and campaigns at scale—professionally and transparently.</p>
+    </section>
 
-  <section id="generator">
-    <h2>Affiliate Link & Message Generator</h2>
-    <form id="genForm">
-      <label>Base URL:<br><input type="text" id="base" value="https://merchant.example/product"></label><br><br>
-      <label>Affiliate ID:<br><input type="text" id="affid" value="YOUR_AFF_ID"></label><br><br>
-      <label>Products (name,sku,discount one per line):<br>
-        <textarea id="products" rows="6" cols="60">Product A,A100,15
-Product B,B200,</textarea>
-      </label><br><br>
-      <button type="submit">Generate</button>
-    </form>
+    <section id="generator">
+      <h2>Affiliate Link &amp; Message Generator</h2>
+      <form id="genform">
+        <label>Products (name, ASIN, discount one per line)</label>
+        <textarea id="lines" rows="4" placeholder="Product A,B000000001,10&#10;Product B,B000000002,15"></textarea>
+        <button type="submit">Generate</button>
+      </form>
+      <div id="output"></div>
+    </section>
 
-    <div id="results"></div>
-    <button id="download" style="display:none;">Download CSV</button>
-  </section>
+    <section id="picks">
+      <h2>Top Picks</h2>
+      <div id="products" class="grid"></div>
+    </section>
 
-  <footer>
-    <p>© 2025 Foreman Affiliates Agency • Disclosure: We may earn commissions at no extra cost to you.</p>
-  </footer>
+    <section id="testimonials">
+      <h2>What People Say</h2>
+      <blockquote>Couldn't ask for better - highly recommended.</blockquote>
+      <cite>- Taylor S.</cite>
+    </section>
+
+    <section id="contact">
+      <h2>Contact Me</h2>
+      <form action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
+        <input name="name" type="text" placeholder="Name" required>
+        <input name="email" type="email" placeholder="Email" required>
+        <textarea name="message" placeholder="Message" required></textarea>
+        <button type="submit">Send Message</button>
+      </form>
+    </section>
+  </main>
+
+  <footer class="footer">© 2025 Foreman Affiliates Agency.</footer>
 
   <script>
-    function makeLink(base, affId, sku) {
-      const tid = crypto.randomUUID();
-      const params = new URLSearchParams({ aff_id: affId, tid, product: sku });
-      return `${base}?${params.toString()}`;
+    // Amazon tag values for US and AU
+    const TAG_US = 'YOUR_US_TAG-20';
+    const TAG_AU = 'YOUR_AU_TAG-22';
+
+    // Determine market based on user locale/timezone
+    function pickMarket() {
+      const tz = (Intl.DateTimeFormat().resolvedOptions().timeZone || '').toLowerCase();
+      const lang = (navigator.language || '').toLowerCase();
+      return (tz.includes('australia') || lang.endsWith('-au')) ? 'AU' : 'US';
     }
 
-    function createMessage(name, link, discount) {
-      let d = discount ? ` Save ${discount}%!` : "";
-      let u = discount ? " Limited time offer." : " Available while stocks last.";
-      return `Check out ${name}!${d} Buy here: ${link}${u}`;
+    // Build Amazon DP link from ASIN and tag
+    function amazonUrlFromAsin(asin) {
+      const market = pickMarket();
+      const domain = (market === 'AU') ? 'www.amazon.com.au' : 'www.amazon.com';
+      const tag = (market === 'AU') ? TAG_AU : TAG_US;
+      return 'https://' + domain + '/dp/' + encodeURIComponent(asin) + '?tag=' + encodeURIComponent(tag);
     }
 
-    document.getElementById("genForm").addEventListener("submit", e => {
+    // Fetch and render product cards from products.json
+    (async function() {
+      try {
+        const res = await fetch('products.json', { cache: 'no-store' });
+        if (!res.ok) return;
+        const items = await res.json();
+        const grid = document.getElementById('products');
+        if (!grid) return;
+        grid.innerHTML = items.map(item => {
+          const url = amazonUrlFromAsin(item.asin);
+          return '<article class="card">' +
+                   '<img src="' + item.img + '" alt="' + item.name + '">' +
+                   '<h3>' + item.name + '</h3>' +
+                   '<a class="btn" href="' + url + '" target="_blank" rel="nofollow sponsored noopener">View</a>' +
+                 '</article>';
+        }).join('');
+      } catch (err) {
+        console.error(err);
+      }
+    })();
+
+    // Generate affiliate links table from user input
+    document.getElementById('genform')?.addEventListener('submit', function(e) {
       e.preventDefault();
-      const base = document.getElementById("base").value;
-      const affId = document.getElementById("affid").value;
-      const products = document.getElementById("products").value.trim().split("\n");
-
-      let rows = [["Product","SKU","Link","Message"]];
-      let html = "<table><tr><th>Product</th><th>SKU</th><th>Link</th><th>Message</th></tr>";
-
-      products.forEach(line => {
-        if (!line) return;
-        const [name, sku, discount] = line.split(",");
-        const link = makeLink(base, affId, sku || "");
-        const msg = createMessage(name, link, discount);
-        rows.push([name, sku || "", link, msg]);
-        html += `<tr><td>${name}</td><td>${sku||""}</td><td><a href="${link}" target="_blank">link</a></td><td>${msg}</td></tr>`;
-      });
-
-      html += "</table>";
-      document.getElementById("results").innerHTML = html;
-      document.getElementById("download").style.display = "inline-block";
-
-      // Save CSV data for download
-      document.getElementById("download").onclick = () => {
-        let csv = rows.map(r => r.map(v => `"${v}"`).join(",")).join("\n");
-        let blob = new Blob([csv], { type: "text/csv" });
-        let url = URL.createObjectURL(blob);
-        let a = document.createElement("a");
-        a.href = url;
-        a.download = "affiliate_links.csv";
-        a.click();
-      };
+      const lines = document.getElementById('lines').value.trim().split(/\n+/).filter(Boolean);
+      const rows = lines.map(line => {
+        const parts = line.split(',');
+        const name = (parts[0] || '').trim();
+        const asin = (parts[1] || '').trim();
+        const disc = (parts[2] || '').trim();
+        const url = amazonUrlFromAsin(asin);
+        return '<tr>' +
+                 '<td>' + (name || asin) + '</td>' +
+                 '<td>' + asin + '</td>' +
+                 '<td><a href="' + url + '" target="_blank" rel="nofollow sponsored noopener">link</a></td>' +
+                 '<td>' + (disc ? ('Save ' + disc + '%') : '') + '</td>' +
+               '</tr>';
+      }).join('');
+      document.getElementById('output').innerHTML = rows ?
+        '<table><thead><tr><th>Product</th><th>ASIN</th><th>Link</th><th>Message</th></tr></thead><tbody>' + rows + '</tbody></table>'
+        : '';
     });
+
+    // Unregister any existing service workers to avoid stale caches
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(rs => {
+        rs.forEach(reg => reg.unregister());
+      });
+    }
   </script>
 </body>
 </html>
